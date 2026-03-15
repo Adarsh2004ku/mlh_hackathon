@@ -8,28 +8,40 @@ All direct OpenAI API calls live here — routes never touch the SDK directly.
 import os
 import json
 import base64
-from openai import OpenAI
+
+# Try importing the OpenAI client. If it's not available, we still keep the app working
+# by using fallback stub responses (no external dependency required).
+try:
+    from openai import OpenAI  # type: ignore
+    _OPENAI_AVAILABLE = True
+except ImportError:  # pragma: no cover
+    OpenAI = None  # type: ignore
+    _OPENAI_AVAILABLE = False
 
 VISION_MODEL = "gpt-4o-mini"   # supports image + text, cost-effective
 TEXT_MODEL   = "gpt-4o-mini"   # fast text generation
 
 
 def _get_client():
-    """Get OpenAI client with API key."""
-    api_key = os.environ.get("OPENAI_API_KEY", "")
-    if not api_key:
-        raise ValueError("OPENAI_API_KEY not set. Get one at https://platform.openai.com/api-keys")
+    """Return an OpenAI client if configured, otherwise None."""
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key or not _OPENAI_AVAILABLE:
+        return None
     return OpenAI(api_key=api_key)
 
 
 # ── Core call helpers ─────────────────────────────────────────────────────────
 
 def vision_generate(image_bytes: bytes, mime_type: str, prompt: str, system: str) -> str:
-    """
-    Send an image + text prompt to OpenAI Vision.
-    Returns the generated text response.
-    """
+    """Send an image + text prompt to OpenAI Vision (with fallback)."""
     client = _get_client()
+
+    if client is None:
+        # Fallback when OpenAI isn't configured: return a safe placeholder.
+        return (
+            "[OpenAI not configured] This would normally be a story generated from the image. "
+            "Set OPENAI_API_KEY to get real results."
+        )
 
     # Convert image to base64
     image_b64 = base64.b64encode(image_bytes).decode('utf-8')
@@ -47,24 +59,24 @@ def vision_generate(image_bytes: bytes, mime_type: str, prompt: str, system: str
                 ]
             }
         ],
-        max_tokens=1000
+        max_tokens=1000,
     )
     return response.choices[0].message.content
 
 
 def text_generate(prompt: str, system: str = "You are a helpful assistant.") -> str:
-    """
-    Send a text-only prompt to OpenAI.
-    Returns the generated text response.
-    """
+    """Send a text-only prompt to OpenAI (with fallback)."""
     client = _get_client()
+    if client is None:
+        return "[OpenAI not configured] This is a placeholder response."
+
     response = client.chat.completions.create(
         model=TEXT_MODEL,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": prompt}
         ],
-        max_tokens=1000
+        max_tokens=1000,
     )
     return response.choices[0].message.content
 
@@ -80,6 +92,9 @@ def chat_respond(
     """
     client = _get_client()
 
+    if client is None:
+        return "[OpenAI not configured] (chat responses are unavailable without an API key.)"
+
     messages = [{"role": "system", "content": system}]
 
     # Add history
@@ -93,7 +108,7 @@ def chat_respond(
     response = client.chat.completions.create(
         model=TEXT_MODEL,
         messages=messages,
-        max_tokens=1000
+        max_tokens=1000,
     )
     return response.choices[0].message.content
 
