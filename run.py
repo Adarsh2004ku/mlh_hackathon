@@ -1,11 +1,11 @@
 """
 ╔══════════════════════════════════════════════════╗
 ║         StoryWeaver AI — Modular Edition         ║
-║         100% FREE · Google Gemini 1.5 Flash      ║
+║         OpenAI GPT-4o Mini                      ║
 ╠══════════════════════════════════════════════════╣
 ║  Setup:                                          ║
-║    pip install flask google-generativeai         ║
-║    export GEMINI_API_KEY=your_key                ║
+║    pip install -r requirements.txt               ║
+║    export OPENAI_API_KEY=your_key                ║
 ║    python run.py                                 ║
 ║    → http://localhost:5000                       ║
 ╚══════════════════════════════════════════════════╝
@@ -14,7 +14,7 @@ Project Structure:
   run.py                  ← Entry point (YOU ARE HERE)
   core/
     config.py             ← Story configs, personas, genre meta
-    gemini.py             ← Gemini AI wrapper functions
+    ai.py                 ← OpenAI wrapper functions
   routes/
     story.py              ← /generate-story  route
     chat.py               ← /chat route
@@ -72,12 +72,13 @@ if __name__ == '__main__':
     print("  🌐 Open:     http://localhost:5001")
     print("=" * 52 + "\n")
 
-    if not os.environ.get("GEMINI_API_KEY"):
-        print("  ⚠  WARNING: GEMINI_API_KEY not set!")
-        print("     export GEMINI_API_KEY=AIza...\n")
+    if not os.environ.get("OPENAI_API_KEY"):
+        print("  ⚠  WARNING: OPENAI_API_KEY not set!")
+        print("     export OPENAI_API_KEY=sk-...\n")
 
     app = create_app()
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(debug=True, port=port)
 else:
     # For Vercel deployment
     app = create_app()

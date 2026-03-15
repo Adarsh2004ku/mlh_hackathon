@@ -19,12 +19,11 @@ class Config:
     # Flask settings
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB for image uploads
 
-    # Gemini API
-    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
+    # OpenAI API
+    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 
     # App settings
     APP_NAME = 'StoryWeaver AI'
-
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True

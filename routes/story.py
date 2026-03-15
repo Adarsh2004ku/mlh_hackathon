@@ -28,7 +28,7 @@ from core.config import (
     get_mime,
     build_user_context,
 )
-from core.gemini import vision_generate, generate_scene_descriptions
+from core.ai import vision_generate, generate_scene_descriptions
 
 story_bp = Blueprint("story", __name__)
 
@@ -54,7 +54,7 @@ def generate_story():
 
     cfg = STORY_CONFIGS.get(story_type, STORY_CONFIGS["kids"])
 
-    # ── Call Gemini ───────────────────────────────────────────────────────────
+    # ── Call OpenAI ───────────────────────────────────────────────────────────
     try:
         image_bytes = file.read()
         mime_type   = get_mime(file.filename)
@@ -64,7 +64,7 @@ def generate_story():
         user_ctx    = build_user_context(profile)
         full_prompt = f"{user_ctx}\n\n{base_prompt}" if user_ctx else base_prompt
 
-        # Generate story via Gemini Vision
+        # Generate story via OpenAI Vision
         story_text = vision_generate(
             image_bytes=image_bytes,
             mime_type=mime_type,
@@ -88,7 +88,7 @@ def generate_story():
     except Exception as e:
         err = str(e)
         if "API_KEY" in err or "api key" in err.lower():
-            return jsonify({"error": "Invalid/missing GEMINI_API_KEY. Get one free at aistudio.google.com"}), 401
+            return jsonify({"error": "Invalid/missing OPENAI_API_KEY. Get one at platform.openai.com"}), 401
         if "quota" in err.lower() or "rate" in err.lower():
             return jsonify({"error": "Rate limit hit. Wait a moment and try again."}), 429
         return jsonify({"error": f"Story generation failed: {err}"}), 500

@@ -1,6 +1,6 @@
 # 📖 StoryWeaver AI
 
-AI-powered image-to-story app · **100% Free** · Google Gemini 1.5 Flash
+AI-powered image-to-story app · OpenAI GPT-4o Mini
 
 ---
 
@@ -10,18 +10,18 @@ AI-powered image-to-story app · **100% Free** · Google Gemini 1.5 Flash
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Get your FREE API key (30 seconds)
-#    → https://aistudio.google.com/app/apikey
+# 2. Get your OpenAI API key
+#    → https://platform.openai.com/api-keys
 
 # 3. Set the key
 cp .env.example .env          # then paste your key inside
 # OR just:
-export GEMINI_API_KEY=AIza...
+export OPENAI_API_KEY=sk-...
 
 # 4. Deploy to Vercel
 #    → https://vercel.com
 #    Connect your GitHub repo and deploy
-#    Set GEMINI_API_KEY in Vercel environment variables
+#    Set OPENAI_API_KEY in Vercel environment variables
 ```
 
 ---
@@ -38,7 +38,7 @@ storyweaver/
 ├── core/                   ← Business logic (no Flask here)
 │   ├── __init__.py
 │   ├── config.py           ← Story configs, personas, quick questions, helpers
-│   └── gemini.py           ← All Gemini AI calls (vision, text, chat)
+│   └── ai.py               ← All OpenAI calls (vision, text, chat)
 │
 ├── routes/                 ← Flask route handlers (blueprints)
 │   ├── __init__.py
@@ -99,7 +99,7 @@ storyweaver/
 
 ## 💰 Cost
 
-Everything is **free**:
-- **Gemini 1.5 Flash** — 1,500 req/day free · 15 req/min
+Pay-per-use with OpenAI:
+- **GPT-4o Mini** — ~$0.15 per 1K tokens · Vision calls cost more
 - **Web Speech API** — built into the browser, zero cost
 - **Canvas animations** — pure JavaScript, no external services

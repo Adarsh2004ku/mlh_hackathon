@@ -6,6 +6,13 @@ Pytest fixtures and configuration for testing.
 
 import pytest
 import os
+import sys
+from pathlib import Path
+
+# Ensure the project root is on sys.path so tests can import application modules
+ROOT_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT_DIR))
+
 from dotenv import load_dotenv
 from run import create_app
 from config import TestingConfig

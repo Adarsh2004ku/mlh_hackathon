@@ -21,7 +21,7 @@ POST /chat
 
 from flask import Blueprint, request, jsonify
 from core.config import CHAT_PERSONAS, build_user_context
-from core.gemini import chat_respond
+from core.ai import chat_respond
 
 chat_bp = Blueprint("chat", __name__)
 
