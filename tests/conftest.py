@@ -14,7 +14,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
 from dotenv import load_dotenv
-from run import create_app
+from app import create_app
 from config import TestingConfig
 
 # Load test environment
