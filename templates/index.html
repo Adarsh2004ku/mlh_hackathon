@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="default">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryWeaver AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Bangers&family=Creepster&family=Orbitron:wght@700;900&family=Nunito:wght@400;700;900&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="noise"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-logo">
+    <span id="headerEmoji">📖</span>
+    <span class="header-title">StoryWeaver <em>AI</em></span>
+  </div>
+  <div class="header-right">
+    <div class="user-pill" id="userPill" style="display:none">
+      <span id="upAvatar">👤</span>
+      <span id="upName">Guest</span>
+    </div>
+    <div class="narrator-chip" id="narratorChip" style="opacity:0">
+      <span class="nc-pulse"></span>
+      <span id="narratorLabel">Narrator</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── 00 PROFILE ── -->
+<section class="section" id="sectionProfile">
+  <div class="section-num">00</div>
+  <h2 class="section-title">Who's Reading?</h2>
+  <p class="section-sub">Tell us about yourself so the story feels made just for you.</p>
+  <div class="profile-card">
+    <div class="profile-grid">
+      <div class="pf-field">
+        <label class="pf-label">Your Name <span class="pf-req">*</span></label>
+        <input class="pf-input" id="pfName" type="text" placeholder="e.g. Arjun, Priya…" maxlength="30">
+      </div>
+      <div class="pf-field">
+        <label class="pf-label">Age</label>
+        <input class="pf-input" id="pfAge" type="number" placeholder="e.g. 12" min="3" max="99">
+      </div>
+      <div class="pf-field">
+        <label class="pf-label">Gender</label>
+        <div class="pf-toggle-row">
+          <button class="pf-toggle" data-val="male"   onclick="togglePf(this,'gender')">👦 Male</button>
+          <button class="pf-toggle" data-val="female" onclick="togglePf(this,'gender')">👧 Female</button>
+          <button class="pf-toggle" data-val="other"  onclick="togglePf(this,'gender')">🧑 Other</button>
+        </div>
+      </div>
+      <div class="pf-field">
+        <label class="pf-label">Mood</label>
+        <div class="pf-toggle-row">
+          <button class="pf-toggle" data-val="happy"   onclick="togglePf(this,'mood')">😊 Happy</button>
+          <button class="pf-toggle" data-val="bored"   onclick="togglePf(this,'mood')">😐 Bored</button>
+          <button class="pf-toggle" data-val="sad"     onclick="togglePf(this,'mood')">😔 Sad</button>
+          <button class="pf-toggle" data-val="excited" onclick="togglePf(this,'mood')">🤩 Excited</button>
+        </div>
+      </div>
+      <div class="pf-field pf-wide">
+        <label class="pf-label">
+          Favourite Thing
+          <span class="pf-hint">(optional — makes the story extra personal!)</span>
+        </label>
+        <input class="pf-input" id="pfFavThing" type="text" placeholder="e.g. dragons, cricket, coding…" maxlength="40">
+      </div>
+    </div>
+    <div class="profile-actions">
+      <button class="btn-skip" onclick="skipProfile()">Skip →</button>
+      <button class="btn-save-profile" id="btnSaveProfile" onclick="saveProfile()" disabled>
+        Let's Go! ✨
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── 01 UPLOAD ── -->
+<section class="section" id="sectionUpload" style="display:none">
+  <div class="section-num">01</div>
+  <h2 class="section-title">Upload Your Image</h2>
+  <p class="section-sub" id="uploadSubText">Every great story starts with a spark.</p>
+  <div class="upload-wrap">
+    <div class="dropzone" id="dropzone">
+      <div class="dz-inner">
+        <div class="dz-icon-wrap"><span>🖼️</span></div>
+        <p class="dz-title">Drop image here</p>
+        <p class="dz-hint">PNG · JPG · WEBP · GIF · up to 16MB</p>
+        <button class="dz-browse-btn" type="button">Browse Files</button>
+      </div>
+      <input type="file" id="fileInput" accept="image/*" hidden>
+    </div>
+    <div class="preview-wrap" id="previewWrap" style="display:none">
+      <img id="previewImg" alt="Story image">
+      <div class="preview-actions">
+        <button class="btn-ghost" id="changeImgBtn">↺ Change</button>
+        <button class="btn-primary" id="proceedBtn">Choose Story Type →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── 02 GENRE ── -->
+<section class="section" id="sectionGenre" style="display:none">
+  <div class="section-num">02</div>
+  <h2 class="section-title">What Kind of Story?</h2>
+  <p class="section-sub">Each choice transforms the entire experience.</p>
+  <div class="genre-grid">
+    <button class="genre-card" onclick="selectGenre('kids',this)">
+      <div class="gc-bg kids-bg"></div>
+      <div class="gc-content"><span class="gc-emoji">🌟</span><span class="gc-title">Kids</span><span class="gc-desc">Magical & Heartwarming</span></div>
+    </button>
+    <button class="genre-card" onclick="selectGenre('funny',this)">
+      <div class="gc-bg funny-bg"></div>
+      <div class="gc-content"><span class="gc-emoji">😂</span><span class="gc-title">Funny</span><span class="gc-desc">Chaotic & Hilarious</span></div>
+    </button>
+    <button class="genre-card" onclick="selectGenre('fantasy',this)">
+      <div class="gc-bg fantasy-bg"></div>
+      <div class="gc-content"><span class="gc-emoji">✨</span><span class="gc-title">Fantasy</span><span class="gc-desc">Epic & Legendary</span></div>
+    </button>
+    <button class="genre-card" onclick="selectGenre('horror',this)">
+      <div class="gc-bg horror-bg"></div>
+      <div class="gc-content"><span class="gc-emoji">🕷️</span><span class="gc-title">Horror</span><span class="gc-desc">Dark & Terrifying</span></div>
+    </button>
+    <button class="genre-card" onclick="selectGenre('scifi',this)">
+      <div class="gc-bg scifi-bg"></div>
+      <div class="gc-content"><span class="gc-emoji">🚀</span><span class="gc-title">Sci-Fi</span><span class="gc-desc">Futuristic & Mind-Bending</span></div>
+    </button>
+  </div>
+</section>
+
+<!-- ── 03 LANGUAGE ── -->
+<section class="section" id="sectionLang" style="display:none">
+  <div class="section-num">03</div>
+  <h2 class="section-title">Narrator Language</h2>
+  <p class="section-sub">Your story, your language.</p>
+  <div class="lang-row">
+    <button class="lang-card active" onclick="selectLang('english',this)">
+      <span class="lc-flag">🇬🇧</span><span class="lc-name">English</span><span class="lc-sub">Web Speech API</span>
+    </button>
+    <button class="lang-card" onclick="selectLang('hindi',this)">
+      <span class="lc-flag">🇮🇳</span><span class="lc-name">हिंदी</span><span class="lc-sub">Hindi Voice</span>
+    </button>
+  </div>
+  <button class="btn-generate" onclick="generateStory()">
+    <span id="genBtnIcon">✨</span>
+    <span id="genBtnText">Weave My Story</span>
+    <span>→</span>
+  </button>
+</section>
+
+<!-- ── 04 STORY + CHAT ── -->
+<section class="section" id="sectionStory" style="display:none">
+
+  <!-- Loading -->
+  <div class="story-loading" id="storyLoading">
+    <div class="loading-animator"><canvas id="loadingCanvas" width="300" height="300"></canvas></div>
+    <p class="loading-text" id="loadingText">Weaving your story…</p>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- Story content -->
+  <div class="story-content" id="storyContent" style="display:none">
+
+    <!-- Narrator bar -->
+    <div class="narrator-bar">
+      <div class="nb-left">
+        <div class="narrator-avatar" id="narratorAvatar"></div>
+        <div>
+          <span class="nb-name" id="nbName">Narrator</span>
+          <span class="nb-status" id="nbStatus">Ready</span>
+        </div>
+      </div>
+      <div class="nb-controls">
+        <button class="nb-btn" id="playBtn" onclick="toggleNarration()">▶</button>
+        <button class="nb-btn" onclick="stopNarration()">■</button>
+        <div class="speed-control">
+          <label>Speed</label>
+          <input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateSpeed(this.value)">
+          <span id="speedVal">1.0×</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scene strip -->
+    <div class="scenes-strip">
+      <div class="scene-card active" id="scene0"><canvas class="scene-canvas" id="sceneCanvas0" width="280" height="180"></canvas><p class="scene-caption" id="sceneCaption0"></p></div>
+      <div class="scene-card"        id="scene1"><canvas class="scene-canvas" id="sceneCanvas1" width="280" height="180"></canvas><p class="scene-caption" id="sceneCaption1"></p></div>
+      <div class="scene-card"        id="scene2"><canvas class="scene-canvas" id="sceneCanvas2" width="280" height="180"></canvas><p class="scene-caption" id="sceneCaption2"></p></div>
+      <div class="scene-card"        id="scene3"><canvas class="scene-canvas" id="sceneCanvas3" width="280" height="180"></canvas><p class="scene-caption" id="sceneCaption3"></p></div>
+    </div>
+
+    <!-- Story book -->
+    <div class="story-book">
+      <div class="book-header">
+        <span class="book-chapter" id="bookChapter">Chapter I</span>
+        <div class="book-progress"><div class="bp-fill" id="bpFill"></div></div>
+      </div>
+      <div class="book-text" id="bookText"></div>
+      <div class="book-cursor" id="bookCursor">|</div>
+    </div>
+
+    <!-- Post actions -->
+    <div class="post-actions" id="postActions" style="display:none">
+      <button class="action-btn" onclick="copyStory()">📋 Copy</button>
+      <button class="action-btn" onclick="toggleNarration()">🎙️ Re-read</button>
+      <button class="action-btn primary" onclick="resetAll()">🔄 New Story</button>
+      <div class="token-info" id="tokenInfo"></div>
+    </div>
+
+    <!-- ── Chat panel ── -->
+    <div class="chat-panel" id="chatPanel" style="display:none">
+      <div class="chat-header">
+        <div class="ch-left">
+          <div class="ch-avatar" id="chAvatar">☀️</div>
+          <div>
+            <span class="ch-title">Ask <span id="chNarratorName">Sunny</span></span>
+            <span class="ch-sub">Ask anything about the story</span>
+          </div>
+        </div>
+        <button class="ch-clear" onclick="clearChat()">↺ Clear</button>
+      </div>
+      <div class="quick-chips" id="quickChips"></div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-welcome" id="chatWelcome">
+          <span class="cw-emoji" id="cwEmoji">☀️</span>
+          <p id="cwText">Ask me anything about the story!</p>
+        </div>
+      </div>
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about the story…" rows="1"
+          onkeydown="chatKeydown(event)" oninput="autoResize(this)"></textarea>
+        <button class="chat-send-btn" id="chatSendBtn" onclick="sendChatMessage()">↑</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<!-- JS files loaded in dependency order -->
+<script src="/static/js/themes.js"></script>
+<script src="/static/js/canvas-art.js"></script>
+<script src="/static/js/app.js"></script>
+<script src="/static/js/chat.js"></script>
+</body>
+</html>
