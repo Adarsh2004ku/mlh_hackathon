@@ -1,105 +1,81 @@
 # 📖 StoryWeaver AI
 
-AI-powered image-to-story app · OpenAI GPT-4o Mini
+A lightweight Flask app that turns an uploaded image into a short story (and helps you chat with the storyteller). The backend uses OpenAI to generate story text, and the frontend renders the experience with dynamic themes, animated scenes, and chat.
 
 ---
 
-## ⚡ Quick Start
+## ✅ Run locally (recommended for judging / review)
+
+### 1) Create a Python virtual environment
 
 ```bash
-# 1. Install dependencies
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 2) Install dependencies
+
+```bash
 pip install -r requirements.txt
-
-# 2. Get your OpenAI API key
-#    → https://platform.openai.com/api-keys
-
-# 3. Set the key
-cp .env.example .env          # then paste your key inside
-# OR just:
-export OPENAI_API_KEY=sk-...
-
-# 4. Deploy to Vercel
-#    → https://vercel.com
-#    Connect your GitHub repo and deploy
-#    Set OPENAI_API_KEY in Vercel environment variables
 ```
 
----
+### 3) Configure OpenAI (optional but recommended)
 
-## 📁 Project Structure
+Create `.env` from the example and paste your key:
 
-```
-storyweaver/
-│
-├── run.py                  ← Entry point — creates Flask app, registers blueprints
-│
-├── config.py               ← Flask configuration settings
-│
-├── core/                   ← Business logic (no Flask here)
-│   ├── __init__.py
-│   ├── config.py           ← Story configs, personas, quick questions, helpers
-│   └── ai.py               ← All OpenAI calls (vision, text, chat)
-│
-├── routes/                 ← Flask route handlers (blueprints)
-│   ├── __init__.py
-│   ├── misc.py             ← GET /  and  GET /quick-questions
-│   ├── story.py            ← POST /generate-story
-│   └── chat.py             ← POST /chat
-│
-├── templates/
-│   └── index.html          ← Single-page HTML (loads CSS + JS from static/)
-│
-├── static/
-│   ├── css/
-│   │   └── style.css       ← All styles + 5 dynamic themes (CSS variables)
-│   └── js/
-│       ├── themes.js       ← Canvas background animations per genre
-│       ├── canvas-art.js   ← 20 animated scene illustrations (4 per genre)
-│       ├── app.js          ← Main app controller (profile, upload, story, narration)
-│       └── chat.js         ← Interactive story Q&A chat
-│
-├── tests/
-│   ├── __init__.py
-│   └── conftest.py         ← Pytest fixtures
-│
-├── requirements.txt
-├── .env.example
-├── .gitignore
-└── vercel.json             ← Vercel deployment config
+```bash
+cp .env.example .env
 ```
 
----
+Then edit `.env` and set `OPENAI_API_KEY=sk-...`.
 
-## 🎨 Features
+> If you don't set a key, the app will still start, but story/chat responses will be placeholder text.
 
-| Feature | Details |
-|---------|---------|
-| 👤 User Profile | Name · Age · Gender · Mood · Favourite thing |
-| 🖼️ Image Upload | Drag & drop or browse — PNG/JPG/WEBP/GIF up to 16MB |
-| 🎭 5 Story Genres | Kids 🌟 · Funny 😂 · Fantasy ✨ · Horror 🕷️ · Sci-Fi 🚀 |
-| 🌈 Dynamic Themes | Full UI transforms per genre (colors, fonts, background particles) |
-| ⌨️ Typewriter | Letter-by-letter story reveal with punctuation pacing |
-| 🎬 Animated Scenes | 4 canvas-drawn animated illustrations per story |
-| 💬 Interactive Chat | Ask the narrator anything · Multi-turn · Genre-matched persona |
-| 🎙️ Voice Narration | Web Speech API · English & Hindi · Speed control |
-| 🇮🇳 Hindi Support | Full story + chat in Hindi |
+### 4) Start the app
+
+```bash
+python run.py
+```
+
+Open http://localhost:5001 in your browser.
 
 ---
 
-## 🔌 API Endpoints
+## 🧪 Run the tests
 
-| Method | Route | Description |
-|--------|-------|-------------|
-| `GET`  | `/` | Main UI |
-| `POST` | `/generate-story` | Generate story from image + profile |
-| `POST` | `/chat` | Interactive story Q&A with narrator |
-| `GET`  | `/quick-questions?genre=<g>` | Suggested chat questions |
+```bash
+pytest -q
+```
+
+This will run the full test suite, including OpenAI wrapper tests (mocked).
 
 ---
 
-## 💰 Cost
+## 🗂️ Project structure (simplified)
 
-Pay-per-use with OpenAI:
-- **GPT-4o Mini** — ~$0.15 per 1K tokens · Vision calls cost more
-- **Web Speech API** — built into the browser, zero cost
-- **Canvas animations** — pure JavaScript, no external services
+- `run.py` - Flask app entrypoint
+- `core/ai.py` - OpenAI wrapper (text + vision + chat)
+- `core/config.py` - story prompts, genres, helpers
+- `routes/` - Flask routes (`/generate-story`, `/chat`, `/quick-questions`)
+- `templates/index.html` + `static/` - frontend UI
+- `tests/` - pytest cases
+
+---
+
+## ⚙️ Notes for judges
+
+- **No external setup required** beyond Python and pip.
+- App works offline (no API key) with placeholder text, so it can be evaluated without a paid OpenAI key.
+- The UI is fully client-side and does not require additional build steps.
+
+---
+
+## 📌 Quick commands
+
+```bash
+# Run the app
+python run.py
+
+# Run tests
+pytest -q
+```
