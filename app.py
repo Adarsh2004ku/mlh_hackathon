@@ -29,8 +29,59 @@ Project Structure:
       canvas-art.js       ← Scene illustrations (20 total)
       app.js              ← Main app controller
       chat.js             ← Interactive story chat
-"""
+"""import os
+import sys
+import logging
+from dotenv import load_dotenv
 
+# 🔥 Make project root importable (VERY IMPORTANT for Vercel)
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from config import get_config
+from flask import Flask
+from routes.story import story_bp
+from routes.chat import chat_bp
+from routes.misc import misc_bp
+
+# Load environment variables
+load_dotenv()
+
+def create_app(config_name=None):
+    app = Flask(
+        __name__,
+        template_folder="templates",   # ✅ fix for Vercel
+        static_folder="static"         # ✅ fix for Vercel
+    )
+
+    config_class = get_config(config_name)
+    app.config.from_object(config_class)
+
+    # Logging
+    logging.basicConfig(level=logging.INFO)
+    app.logger.setLevel(logging.INFO)
+
+    # Register blueprints
+    app.register_blueprint(misc_bp)
+    app.register_blueprint(story_bp)
+    app.register_blueprint(chat_bp)
+
+    return app
+
+
+# 🚨 THIS LINE IS WHAT VERCEL NEEDS
+app = create_app()
+
+
+# Local run only
+if __name__ == "__main__":
+    print("\n🚀 Running locally...")
+    print("🌐 http://localhost:5001\n")
+
+    if not (os.environ.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY_1")):
+        print("⚠ WARNING: GEMINI_API_KEY not set!\n")
+
+    port = int(os.environ.get("PORT", 5001))
+    app.run(debug=True, port=port)
 from flask import Flask
 from routes.story import story_bp
 from routes.chat import chat_bp
@@ -68,7 +119,7 @@ if __name__ == '__main__':
     print("\n" + "=" * 52)
     print("  StoryWeaver AI — Modular Edition")
     print("=" * 52)
-    print("  🔑 FREE key: aistudio.google.com/app/apikey")
+    print("  🔑 FREE key: https://platform.openai.com/api-keys")
     print("  🌐 Open:     http://localhost:5001")
     print("=" * 52 + "\n")
 
@@ -82,3 +133,4 @@ if __name__ == '__main__':
 else:
     # For Vercel deployment
     app = create_app()
+

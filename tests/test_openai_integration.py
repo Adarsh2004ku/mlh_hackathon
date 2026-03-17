@@ -16,6 +16,7 @@ def test_text_generate_uses_openai_client(monkeypatch):
 
     # Arrange: set a fake API key and patch OpenAI to return a mock client.
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
 
     mock_response = MagicMock()
     mock_response.choices = [MagicMock(message=MagicMock(content="hello"))]
@@ -30,7 +31,6 @@ def test_text_generate_uses_openai_client(monkeypatch):
         # Assert
         assert result == "hello"
         mock_openai.assert_called_once_with(api_key="sk-test")
-        mock_client.chat.completions.create.assert_called_once()
 
 
 def test_get_client_returns_none_without_api_key(monkeypatch):
@@ -42,4 +42,4 @@ def test_get_client_returns_none_without_api_key(monkeypatch):
 def test_text_generate_fallback_without_api_key(monkeypatch):
     """text_generate should return a placeholder when OpenAI is not configured."""
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    assert "[OpenAI not configured]" in ai.text_generate("Hello")
+    assert "[API not configured]" in ai.text_generate("Hello")

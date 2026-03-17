@@ -28,7 +28,9 @@ from core.config import (
     get_mime,
     build_user_context,
 )
-from core.ai import vision_generate, generate_scene_descriptions
+# ✅ Now imports generate_story_and_scenes (1 call) instead of
+#    vision_generate + generate_scene_descriptions (2 calls)
+from core.ai import generate_story_and_scenes
 
 story_bp = Blueprint("story", __name__)
 
@@ -54,26 +56,22 @@ def generate_story():
 
     cfg = STORY_CONFIGS.get(story_type, STORY_CONFIGS["kids"])
 
-    # ── Call OpenAI ───────────────────────────────────────────────────────────
+    # ── Single API call — story + scenes together ─────────────────────────────
     try:
         image_bytes = file.read()
         mime_type   = get_mime(file.filename)
 
-        # Build prompt with optional personalisation
         base_prompt = cfg["hi_prompt"] if language == "hindi" else cfg["en_prompt"]
         user_ctx    = build_user_context(profile)
         full_prompt = f"{user_ctx}\n\n{base_prompt}" if user_ctx else base_prompt
 
-        # Generate story via OpenAI Vision
-        story_text = vision_generate(
+        # ✅ ONE call instead of TWO
+        story_text, scenes = generate_story_and_scenes(
             image_bytes=image_bytes,
             mime_type=mime_type,
-            prompt=full_prompt,
+            story_prompt=full_prompt,
             system=cfg["system"],
         )
-
-        # Generate 4 animated scene descriptions
-        scenes = generate_scene_descriptions(story_text, story_type)
 
         return jsonify({
             "success":    True,
@@ -87,8 +85,8 @@ def generate_story():
 
     except Exception as e:
         err = str(e)
-        if "API_KEY" in err or "api key" in err.lower():
-            return jsonify({"error": "Invalid/missing OPENAI_API_KEY. Get one at platform.openai.com"}), 401
-        if "quota" in err.lower() or "rate" in err.lower():
-            return jsonify({"error": "Rate limit hit. Wait a moment and try again."}), 429
+        if any(x in err.lower() for x in ["api_key", "api key", "invalid", "unauthorized", "401"]):
+            return jsonify({"error": "Invalid/missing API key. Check your .env file."}), 401
+        if any(x in err.lower() for x in ["429", "quota", "rate_limit", "rate limit", "too many"]):
+            return jsonify({"error": "Rate limit hit. The app will auto-retry — please wait 20s and try again."}), 429
         return jsonify({"error": f"Story generation failed: {err}"}), 500

@@ -19,22 +19,33 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 3) Configure OpenAI (optional but recommended)
+### 3) Configure AI API (optional but recommended)
 
-Create `.env` from the example and paste your key:
+The app uses **OpenAI-compatible APIs**. You have two free options:
 
-```bash
-cp .env.example .env
+#### Option A: OpenAI (paid, but has free credits)
+1. Sign up at https://platform.openai.com/api-keys
+2. Get your key: `sk-...`
+3. In `.env`:
+```
+OPENAI_API_KEY=sk-...
 ```
 
-Then edit `.env` and set `OPENAI_API_KEY=sk-...`.
+#### Option B: OpenRouter (free tier, OpenAI-compatible)
+1. Sign up free at https://openrouter.ai/keys
+2. Get your key: `sk-or-...`
+3. In `.env`:
+```
+OPENAI_API_KEY=sk-or-...
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+```
 
-> If you don't set a key, the app will still start, but story/chat responses will be placeholder text.
+> If you skip this step, the app will run with placeholder text (no AI calls).
 
 ### 4) Start the app
 
 ```bash
-python run.py
+python app.py
 ```
 
 Open http://localhost:5001 in your browser.
@@ -74,7 +85,7 @@ This will run the full test suite, including OpenAI wrapper tests (mocked).
 
 ```bash
 # Run the app
-python run.py
+python app.py
 
 # Run tests
 pytest -q
