@@ -7,8 +7,8 @@ Flask application configuration settings.
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (override empty exported vars)
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), ".env"), override=True)
 
 class Config:
     """Base configuration."""
@@ -19,8 +19,8 @@ class Config:
     # Flask settings
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB for image uploads
 
-    # OpenAI API
-    OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
+    # Gemini API
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
 
     # App settings
     APP_NAME = 'StoryWeaver AI'

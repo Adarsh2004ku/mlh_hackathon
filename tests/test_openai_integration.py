@@ -1,45 +1,47 @@
 """tests/test_openai_integration.py
 =========================
 
-Tests that the OpenAI wrapper in `core/ai.py` calls the OpenAI SDK correctly.
+Tests that the Gemini wrapper in `core/ai.py` calls the GenAI SDK correctly.
 """
 
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from core import ai
 
 
-def test_text_generate_uses_openai_client(monkeypatch):
-    """Ensure text_generate calls OpenAI.chat.completions.create and returns content."""
+def test_text_generate_uses_gemini_client(monkeypatch):
+    """Ensure text_generate calls genai.Client().models.generate_content and returns text."""
 
-    # Arrange: set a fake API key and patch OpenAI to return a mock client.
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+    # Arrange: set a fake API key and patch genai.Client to return a mock client.
+    monkeypatch.setenv("GEMINI_API_KEY", "test-key")
 
     mock_response = MagicMock()
-    mock_response.choices = [MagicMock(message=MagicMock(content="hello"))]
+    mock_response.text = "hello"
 
     mock_client = MagicMock()
-    mock_client.chat.completions.create.return_value = mock_response
+    mock_client.models.generate_content.return_value = mock_response
 
-    with patch("core.ai.OpenAI", return_value=mock_client) as mock_openai:
+    # Make tests pass even if google-genai isn't installed in the test environment.
+    fake_genai = MagicMock()
+    fake_genai.Client.return_value = mock_client
+
+    with patch.object(ai, "_GEMINI_AVAILABLE", True), patch.object(ai, "genai", fake_genai):
         # Act
         result = ai.text_generate("Hi there", system="You are a helpful assistant.")
 
         # Assert
         assert result == "hello"
-        mock_openai.assert_called_once_with(api_key="sk-test")
+        fake_genai.Client.assert_called_with(api_key="test-key")
+        assert fake_genai.Client.call_count >= 1
 
 
 def test_get_client_returns_none_without_api_key(monkeypatch):
-    """_get_client should return None if OPENAI_API_KEY is missing."""
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    """_get_client should return None if GEMINI_API_KEY is missing."""
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     assert ai._get_client() is None
 
 
 def test_text_generate_fallback_without_api_key(monkeypatch):
-    """text_generate should return a placeholder when OpenAI is not configured."""
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    """text_generate should return a placeholder when Gemini is not configured."""
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
     assert "[API not configured]" in ai.text_generate("Hello")

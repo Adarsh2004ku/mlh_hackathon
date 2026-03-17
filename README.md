@@ -1,6 +1,6 @@
 # 📖 StoryWeaver AI
 
-A lightweight Flask app that turns an uploaded image into a short story (and helps you chat with the storyteller). The backend uses OpenAI to generate story text, and the frontend renders the experience with dynamic themes, animated scenes, and chat.
+A lightweight Flask app that turns an uploaded image into a short story (and helps you chat with the storyteller). The backend uses **Gemini** to generate story text, and the frontend renders the experience with dynamic themes, animated scenes, and chat.
 
 ---
 
@@ -21,23 +21,13 @@ pip install -r requirements.txt
 
 ### 3) Configure AI API (optional but recommended)
 
-The app uses **OpenAI-compatible APIs**. You have two free options:
+The app uses **Gemini (Google GenAI)**.
 
-#### Option A: OpenAI (paid, but has free credits)
-1. Sign up at https://platform.openai.com/api-keys
-2. Get your key: `sk-...`
-3. In `.env`:
-```
-OPENAI_API_KEY=sk-...
-```
+1. Create a key in Google AI Studio: https://aistudio.google.com/app/apikey
+2. In `.env`:
 
-#### Option B: OpenRouter (free tier, OpenAI-compatible)
-1. Sign up free at https://openrouter.ai/keys
-2. Get your key: `sk-or-...`
-3. In `.env`:
 ```
-OPENAI_API_KEY=sk-or-...
-OPENAI_BASE_URL=https://openrouter.ai/api/v1
+GEMINI_API_KEY=your_key_here
 ```
 
 > If you skip this step, the app will run with placeholder text (no AI calls).
@@ -58,14 +48,14 @@ Open http://localhost:5001 in your browser.
 pytest -q
 ```
 
-This will run the full test suite, including OpenAI wrapper tests (mocked).
+This will run the full test suite, including Gemini wrapper tests (mocked).
 
 ---
 
 ## 🗂️ Project structure (simplified)
 
 - `run.py` - Flask app entrypoint
-- `core/ai.py` - OpenAI wrapper (text + vision + chat)
+- `core/ai.py` - Gemini wrapper (text + vision + chat)
 - `core/config.py` - story prompts, genres, helpers
 - `routes/` - Flask routes (`/generate-story`, `/chat`, `/quick-questions`)
 - `templates/index.html` + `static/` - frontend UI
@@ -76,7 +66,7 @@ This will run the full test suite, including OpenAI wrapper tests (mocked).
 ## ⚙️ Notes for judges
 
 - **No external setup required** beyond Python and pip.
-- App works offline (no API key) with placeholder text, so it can be evaluated without a paid OpenAI key.
+- App works offline (no API key) with placeholder text, so it can be evaluated without an API key.
 - The UI is fully client-side and does not require additional build steps.
 
 ---
